@@ -8,4 +8,3 @@ router.post("/payment/create-order", paymentRateLimiter, paymentController.creat
 // Frontend calls this after Razorpay checkout handler fires
 router.post("/payment/verify", paymentRateLimiter, paymentController.verifyPayment);
 export default router;
-//# sourceMappingURL=payment.route.js.map

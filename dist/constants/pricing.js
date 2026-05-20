@@ -15,4 +15,3 @@ export const vastuSessionPricing = new Map([
     ["Site Visit: ₹11,000", 11000],
     ["Detailed Report: ₹40,000", 40000],
 ]);
-//# sourceMappingURL=pricing.js.map

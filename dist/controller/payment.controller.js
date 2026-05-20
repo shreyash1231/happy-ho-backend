@@ -149,4 +149,3 @@ class OrderController {
     }
 }
 export default new OrderController();
-//# sourceMappingURL=payment.controller.js.map

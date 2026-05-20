@@ -12,4 +12,3 @@ export const paymentRateLimiter = rateLimit({
         return ipKeyGenerator(req.ip || "");
     },
 });
-//# sourceMappingURL=rateLimiter.js.map

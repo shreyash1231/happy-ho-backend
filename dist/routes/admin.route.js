@@ -9,4 +9,3 @@ router.post("/login", AdminController.login);
 router.get("/bookings", adminAuthMiddleware, AdminController.getAllBookings);
 router.get("/getbookingdatabyid/:id", adminAuthMiddleware, AdminController.getBookingById);
 export default router;
-//# sourceMappingURL=admin.route.js.map

@@ -46,4 +46,3 @@ export const adminAuthMiddleware = async (req, res, next) => {
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
-//# sourceMappingURL=AdminauthMiddleware.js.map
