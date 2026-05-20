@@ -10,56 +10,56 @@ import Booking from "../model/booking.model.js";
 
 dotenv.config();
 class AdminController {
-  // static async register(req: Request, res: Response) {
-  //   try {
-  //     const { email, password } = req.body;
+  static async register(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
 
-  //     // validation
-  //     if (!email || !password) {
-  //       return res.status(400).json({
-  //         success: false,
-  //         message: "Email and password are required",
-  //       });
-  //     }
+      // validation
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "Email and password are required",
+        });
+      }
 
-  //     // check existing admin
-  //   //   const existingAdmin = await User.findOne({ email });
+      // check existing admin
+    //   const existingAdmin = await User.findOne({ email });
 
-  //   //   if (existingAdmin) {
-  //   //     return res.status(400).json({
-  //   //       success: false,
-  //   //       message: "Admin already exists",
-  //   //     });
-  //   //   }
+    //   if (existingAdmin) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: "Admin already exists",
+    //     });
+    //   }
 
-  //     // hash password
-  //     const hashedPassword = await bcrypt.hash(password, 10);
+      // hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-  //     // create admin
-  //     const admin = await User.create({
-  //       email,
-  //       password: hashedPassword,
-  //       role: "admin",
-  //     });
+      // create admin
+      const admin = await User.create({
+        email,
+        password: hashedPassword,
+        role: "admin",
+      });
 
-  //     return res.status(201).json({
-  //       success: true,
-  //       message: "Admin created successfully",
-  //       data: {
-  //         id: admin._id,
-  //         email: admin.email,
-  //         role: admin.role,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
+      return res.status(201).json({
+        success: true,
+        message: "Admin created successfully",
+        data: {
+          id: admin._id,
+          email: admin.email,
+          role: admin.role,
+        },
+      });
+    } catch (error) {
+      console.error(error);
 
-  //     return res.status(500).json({
-  //       success: false,
-  //       message: "Server error",
-  //     });
-  //   }
-  // }
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
+  }
   static async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
