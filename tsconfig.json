@@ -9,7 +9,6 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
-    "types": ["node"],
 
     /* TypeScript Behavior */
     "strict": true,
