@@ -1,40 +1,81 @@
 import express from "express";
-import PaymentOrder from "./routes/payment.route.js";
-import AdminRoute from "./routes/admin.route.js";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import cors from "cors";
+import PaymentOrder from "./routes/payment.route.js";
+import AdminRoute from "./routes/admin.route.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-connectDB();
+/* ---------------------------------------------------
+   CORS CONFIG
+--------------------------------------------------- */
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://happyho.in",
+  "https://www.happyho.in",
+  "https://happy-web-wordpress.vercel.app",
+];
 
-const corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "https://happyho.in",
-    "https://www.happyho.in",
-    "https://happy-web-wordpress.vercel.app",
-  ],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    maxAge: 86400,
+  })
+);
 
-// ✅ Handle preflight BEFORE other middleware
-app.use(cors(corsOptions));
+/* ---------------------------------------------------
+   COMMON MIDDLEWARE
+--------------------------------------------------- */
+app.use(cookieParser());
+app.use(express.json({ limit: "100kb" }));
+app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
-// ✅ Apply the same config to all routes
-app.use(cors(corsOptions));
+/* ---------------------------------------------------
+   HEALTH CHECK
+--------------------------------------------------- */
+app.get("/", (req, res) => {
+  res.json({ status: "ok" });
+});
 
-app.use(express.json());
-
+/* ---------------------------------------------------
+   API ROUTES
+--------------------------------------------------- */
 app.use("/api/v1", PaymentOrder);
 app.use("/api/v2/admin", AdminRoute);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+/* ---------------------------------------------------
+   API FALLBACK
+--------------------------------------------------- */
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "API route not found",
+    path: req.originalUrl,
+  });
 });
+
+/* ---------------------------------------------------
+   SERVER START
+--------------------------------------------------- */
+const connectServer = () => {
+  connectDB();
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port: ${PORT}`);
+  });
+};
+
+export default connectServer;
