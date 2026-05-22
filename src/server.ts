@@ -1,10 +1,17 @@
 import express from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import PaymentOrder from "./routes/payment.route.js";
 import AdminRoute from "./routes/admin.route.js";
+
+declare global {
+  namespace Express {
+    interface Request {
+      cookies?: Record<string, string>;
+    }
+  }
+}
 
 dotenv.config();
 
@@ -79,3 +86,23 @@ const connectServer = () => {
 };
 
 export default connectServer;
+
+function cookieParser(): express.RequestHandler {
+  return (req, res, next) => {
+    req.cookies = {};
+    const cookieHeader = req.headers.cookie;
+
+    if (typeof cookieHeader === "string" && cookieHeader.length > 0) {
+      cookieHeader.split(";").forEach((cookie) => {
+        const [name, ...valueParts] = cookie.split("=");
+        if (!name) {
+          return;
+        }
+        const value = valueParts.join("=").trim();
+        req.cookies![name.trim()] = decodeURIComponent(value);
+      });
+    }
+
+    next();
+  };
+}
