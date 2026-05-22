@@ -9,11 +9,13 @@ const app = express();
 
 const PORT = process.env.PORT || 5000;
 connectDB();
-
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
+      "https://happyho.in",
+      "https://www.happyho.in",
+      "https://happy-web-wordpress.vercel.app"
     ],
     credentials: true,
   })
