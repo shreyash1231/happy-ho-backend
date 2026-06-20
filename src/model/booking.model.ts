@@ -9,7 +9,8 @@ export interface IBooking extends Document {
   selectedService: string;
   selectedGuide: string;
   sessionType: "Online" | "Offline";
-  preferredDateTime: Date;
+  preferredDateTime?: Date;
+  calendlyEventUri?: string;
   concernArea: string;
 
   createdAt: Date;
@@ -54,7 +55,12 @@ const bookingSchema = new Schema<IBooking>(
 
     preferredDateTime: {
       type: Date,
-      required: true,
+      required: false,
+    },
+
+    calendlyEventUri: {
+      type: String,
+      required: false,
     },
 
     concernArea: {

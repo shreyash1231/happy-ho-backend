@@ -46,7 +46,7 @@ export const createOrderSchema = z
 
     preferredDateTime: z
       .string()
-      .min(1, "Preferred date & time is required"),
+      .optional(),
 
     concernArea: z.string().min(5, "Concern area is required"),
 

@@ -17,7 +17,7 @@ import razorpay from "../config/razorpay.js";
 dotenv.config();
 
 class OrderController {
- async createOrder(req: Request, res: Response) {
+  async createOrder(req: Request, res: Response) {
     try {
       // =========================
       // VALIDATE DATA
@@ -74,8 +74,6 @@ class OrderController {
           validatedData.selectedGuide,
         sessionType:
           validatedData.sessionType,
-        preferredDateTime:
-          validatedData.preferredDateTime,
         concernArea:
           validatedData.concernArea,
       });
@@ -123,7 +121,11 @@ class OrderController {
         },
       });
     } catch (error: any) {
-      console.log(error);
+      console.log("Incoming payload:", JSON.stringify(req.body.payload, null, 2));
+      console.log("Error name:", error.name);
+      console.log("Error message:", error.message);
+      console.log("Full error:", error);
+      console.log("Error stack:", error.stack);
 
       return res.status(400).json({
         success: false,
@@ -131,6 +133,7 @@ class OrderController {
           error.errors?.[0]?.message ||
           error.message ||
           "Validation failed",
+        details: error.errors || error.issues,
       });
     }
   }
@@ -227,6 +230,85 @@ class OrderController {
         message:
           error.message ||
           "Internal server error",
+      });
+    }
+  }
+  // =========================
+  // UPDATE BOOKING SLOT (after Calendly selection)
+  // =========================
+
+  async updateBookingSlot(
+    req: Request,
+    res: Response
+  ) {
+    try {
+      const {
+        bookingId,
+        calendlyEventUri,
+        calendlyInviteeUri,
+      } = req.body;
+
+      if (!bookingId) {
+        return res.status(400).json({
+          success: false,
+          message: "bookingId is required",
+        });
+      }
+
+      let preferredDateTime: Date | null = null;
+
+      // If we have the Calendly event URI, fetch the actual event details
+      if (calendlyEventUri) {
+        const calendlyToken = process.env.CALENDLY_ACCESS_TOKEN;
+        if (calendlyToken) {
+          try {
+            const eventResponse = await fetch(calendlyEventUri, {
+              headers: {
+                Authorization: `Bearer ${calendlyToken}`,
+              },
+            });
+            if (eventResponse.ok) {
+              const eventData = (await eventResponse.json()) as any;
+              preferredDateTime = new Date(eventData.resource?.start_time);
+              console.log("Fetched event start_time from Calendly:", eventData.resource?.start_time);
+            } else {
+              console.error("Failed to fetch Calendly event:", eventResponse.status);
+            }
+          } catch (fetchErr) {
+            console.error("Error fetching Calendly event:", fetchErr);
+          }
+        }
+      }
+
+      const updateData: any = {};
+      if (preferredDateTime) updateData.preferredDateTime = preferredDateTime;
+      if (calendlyEventUri) updateData.calendlyEventUri = calendlyEventUri;
+
+      const booking = await Booking.findByIdAndUpdate(
+        bookingId,
+        updateData,
+        { new: true }
+      );
+
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: "Booking not found",
+        });
+      }
+
+      console.log("Booking updated:", booking._id, "preferredDateTime:", booking.preferredDateTime);
+
+      return res.status(200).json({
+        success: true,
+        message: "Booking slot updated successfully",
+        data: booking,
+      });
+    } catch (error: any) {
+      console.error("UpdateBookingSlot Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || "Internal server error",
       });
     }
   }
