@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 
 const PORT = process.env.PORT || 5000;
-connectDB();
+
 app.use(
   cors({
     origin: [
@@ -25,6 +25,12 @@ app.use(express.json());
 app.use("/api/v1/", PaymentOrder);
 app.use("/api/v2/admin", AdminRoute);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
+
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });
