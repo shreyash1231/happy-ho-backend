@@ -248,6 +248,10 @@ class OrderController {
         calendlyInviteeUri,
       } = req.body;
 
+      console.log("bookingId: ", bookingId);
+      console.log("calendlyEventUri: ", calendlyEventUri);
+      console.log("calendlyInviteeUri: ", calendlyInviteeUri);
+
       if (!bookingId) {
         return res.status(400).json({
           success: false,
@@ -256,6 +260,7 @@ class OrderController {
       }
 
       let preferredDateTime: Date | null = null;
+      console.log("preferredDateTime: ", preferredDateTime);
 
       // If we have the Calendly event URI, fetch the actual event details
       if (calendlyEventUri) {
@@ -269,6 +274,7 @@ class OrderController {
             });
             if (eventResponse.ok) {
               const eventData = (await eventResponse.json()) as any;
+              console.log(eventData.resource?.start_time);
               preferredDateTime = new Date(eventData.resource?.start_time);
               console.log("Fetched event start_time from Calendly:", eventData.resource?.start_time);
             } else {

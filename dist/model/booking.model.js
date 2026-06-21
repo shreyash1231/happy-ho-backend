@@ -31,7 +31,11 @@ const bookingSchema = new Schema({
     },
     preferredDateTime: {
         type: Date,
-        required: true,
+        required: false,
+    },
+    calendlyEventUri: {
+        type: String,
+        required: false,
     },
     concernArea: {
         type: String,

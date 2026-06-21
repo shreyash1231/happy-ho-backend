@@ -37,7 +37,7 @@ export const createOrderSchema = z
     sessionType: z.enum(["Online", "Offline"]),
     preferredDateTime: z
         .string()
-        .min(1, "Preferred date & time is required"),
+        .optional(),
     concernArea: z.string().min(5, "Concern area is required"),
     // 👇 optional field (important for validation rules)
     session: z.string().optional(),
