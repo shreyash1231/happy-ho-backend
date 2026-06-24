@@ -10,21 +10,19 @@ router.get("/health", (req, res) => { res.send("OK"); });
 // CREATE ORDER — unchanged route, same rate limiter
 router.post(
   "/payment/create-order",
-  paymentRateLimiter,
   paymentController.createOrder
 );
 
 // VERIFY — replaces /payment/success
 // Frontend calls this after Razorpay checkout handler fires
 router.post(
-  "/payment/verify", paymentRateLimiter,
+  "/payment/verify", 
   paymentController.verifyPayment
 );
 
 // UPDATE BOOKING SLOT — after Calendly slot selection
 router.post(
   "/payment/update-booking-slot",
-  paymentRateLimiter,
   paymentController.updateBookingSlot
 );
 
