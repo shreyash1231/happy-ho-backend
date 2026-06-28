@@ -245,8 +245,8 @@ class OrderController {
     try {
       const {
         bookingId,
-        calendlyEventUri,
-        calendlyInviteeUri,
+        calBookingUid,
+        calStartTime,
       } = req.body;
 
       if (!bookingId) {
@@ -265,41 +265,34 @@ class OrderController {
         });
       }
 
-      const guideName = existingBooking.selectedGuide;
-      console.log("Guide:", guideName);
-
-      // Get the guide's personal Calendly token (falls back to global)
-      const calendlyToken = getGuideCalendlyToken(guideName);
-      if (!calendlyToken) {
-        console.warn(`No Calendly token found for guide: ${guideName}`);
-      }
 
       let preferredDateTime: Date | null = null;
+      preferredDateTime = new Date(calStartTime);
 
-      // Fetch the actual event details from Calendly using guide's token
-      if (calendlyEventUri && calendlyToken) {
-        try {
-          const eventResponse = await fetch(calendlyEventUri, {
-            headers: {
-              Authorization: `Bearer ${calendlyToken}`,
-            },
-          });
-          if (eventResponse.ok) {
-            const eventData = (await eventResponse.json()) as any;
-            preferredDateTime = new Date(eventData.resource?.start_time);
-            console.log(`[${guideName}] Fetched event start_time:`, eventData.resource?.start_time);
-          } else {
-            const errText = await eventResponse.text();
-            console.error(`[${guideName}] Failed to fetch Calendly event (${eventResponse.status}):`, errText);
-          }
-        } catch (fetchErr) {
-          console.error(`[${guideName}] Error fetching Calendly event:`, fetchErr);
-        }
-      }
+      // // Fetch the actual event details from Calendly using guide's token
+      // if (calendlyEventUri && calendlyToken) {
+      //   try {
+      //     const eventResponse = await fetch(calendlyEventUri, {
+      //       headers: {
+      //         Authorization: `Bearer ${calendlyToken}`,
+      //       },
+      //     });
+      //     if (eventResponse.ok) {
+      //       const eventData = (await eventResponse.json()) as any;
+      //       preferredDateTime = new Date(eventData.resource?.start_time);
+      //       console.log(`[${guideName}] Fetched event start_time:`, eventData.resource?.start_time);
+      //     } else {
+      //       const errText = await eventResponse.text();
+      //       console.error(`[${guideName}] Failed to fetch Calendly event (${eventResponse.status}):`, errText);
+      //     }
+      //   } catch (fetchErr) {
+      //     console.error(`[${guideName}] Error fetching Calendly event:`, fetchErr);
+      //   }
+      // }
 
       const updateData: any = {};
       if (preferredDateTime) updateData.preferredDateTime = preferredDateTime;
-      if (calendlyEventUri) updateData.calendlyEventUri = calendlyEventUri;
+      if (calBookingUid) updateData.calBookingUid = calBookingUid;
 
       const booking = await Booking.findByIdAndUpdate(
         bookingId,
@@ -307,7 +300,7 @@ class OrderController {
         { new: true }
       );
 
-      console.log(`Booking ${booking?._id} updated | Guide: ${guideName} | preferredDateTime: ${booking?.preferredDateTime}`);
+      console.log(`Booking ${booking?._id} updated | preferredDateTime: ${booking?.preferredDateTime} | calBookingUid: ${booking?.calBookingUid}`);
 
       return res.status(200).json({
         success: true,
