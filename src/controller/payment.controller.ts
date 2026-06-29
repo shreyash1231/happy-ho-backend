@@ -13,7 +13,6 @@ import {
   vastuSessionPricing,
 } from "../constants/pricing.js";
 import razorpay from "../config/razorpay.js";
-import { getGuideCalendlyToken } from "../config/calendlyAccess.js";
 
 dotenv.config();
 
@@ -265,30 +264,8 @@ class OrderController {
         });
       }
 
-
       let preferredDateTime: Date | null = null;
       preferredDateTime = new Date(calStartTime);
-
-      // // Fetch the actual event details from Calendly using guide's token
-      // if (calendlyEventUri && calendlyToken) {
-      //   try {
-      //     const eventResponse = await fetch(calendlyEventUri, {
-      //       headers: {
-      //         Authorization: `Bearer ${calendlyToken}`,
-      //       },
-      //     });
-      //     if (eventResponse.ok) {
-      //       const eventData = (await eventResponse.json()) as any;
-      //       preferredDateTime = new Date(eventData.resource?.start_time);
-      //       console.log(`[${guideName}] Fetched event start_time:`, eventData.resource?.start_time);
-      //     } else {
-      //       const errText = await eventResponse.text();
-      //       console.error(`[${guideName}] Failed to fetch Calendly event (${eventResponse.status}):`, errText);
-      //     }
-      //   } catch (fetchErr) {
-      //     console.error(`[${guideName}] Error fetching Calendly event:`, fetchErr);
-      //   }
-      // }
 
       const updateData: any = {};
       if (preferredDateTime) updateData.preferredDateTime = preferredDateTime;
