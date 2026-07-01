@@ -38,7 +38,7 @@ export const createOrderSchema = z
     preferredDateTime: z
         .string()
         .optional(),
-    concernArea: z.string().min(5, "Concern area is required"),
+    concernArea: z.string().optional(),
     // 👇 optional field (important for validation rules)
     session: z.string().optional(),
 })

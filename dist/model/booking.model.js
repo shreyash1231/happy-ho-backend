@@ -33,14 +33,14 @@ const bookingSchema = new Schema({
         type: Date,
         required: false,
     },
-    calendlyEventUri: {
+    calBookingUid: {
         type: String,
         required: false,
     },
     concernArea: {
         type: String,
-        required: true,
         trim: true,
+        default: "", // Optional field with default empty string
     },
 }, {
     timestamps: true,

@@ -37,15 +37,21 @@ class OrderController {
             // =========================
             // CREATE BOOKING
             // =========================
-            const booking = await Booking.create({
+            const bookingData = {
                 fullName: validatedData.fullName,
                 email: validatedData.email,
                 phoneNumber: validatedData.phoneNumber,
                 selectedService: validatedData.selectedService,
                 selectedGuide: validatedData.selectedGuide,
                 sessionType: validatedData.sessionType,
-                concernArea: validatedData.concernArea,
-            });
+            };
+            if (validatedData.concernArea?.trim()) {
+                bookingData.concernArea = validatedData.concernArea;
+            }
+            if (validatedData.preferredDateTime) {
+                bookingData.preferredDateTime = validatedData.preferredDateTime;
+            }
+            const booking = await Booking.create(bookingData);
             // =========================
             // CREATE RAZORPAY ORDER
             // =========================
@@ -156,56 +162,30 @@ class OrderController {
     // =========================
     async updateBookingSlot(req, res) {
         try {
-            const { bookingId, calendlyEventUri, calendlyInviteeUri, } = req.body;
-            console.log("bookingId: ", bookingId);
-            console.log("calendlyEventUri: ", calendlyEventUri);
-            console.log("calendlyInviteeUri: ", calendlyInviteeUri);
+            const { bookingId, calBookingUid, calStartTime, } = req.body;
             if (!bookingId) {
                 return res.status(400).json({
                     success: false,
                     message: "bookingId is required",
                 });
             }
-            let preferredDateTime = null;
-            console.log("preferredDateTime: ", preferredDateTime);
-            // If we have the Calendly event URI, fetch the actual event details
-            if (calendlyEventUri) {
-                const calendlyToken = process.env.CALENDLY_ACCESS_TOKEN;
-                if (calendlyToken) {
-                    try {
-                        const eventResponse = await fetch(calendlyEventUri, {
-                            headers: {
-                                Authorization: `Bearer ${calendlyToken}`,
-                            },
-                        });
-                        if (eventResponse.ok) {
-                            const eventData = (await eventResponse.json());
-                            console.log(eventData.resource?.start_time);
-                            preferredDateTime = new Date(eventData.resource?.start_time);
-                            console.log("Fetched event start_time from Calendly:", eventData.resource?.start_time);
-                        }
-                        else {
-                            console.error("Failed to fetch Calendly event:", eventResponse.status);
-                        }
-                    }
-                    catch (fetchErr) {
-                        console.error("Error fetching Calendly event:", fetchErr);
-                    }
-                }
-            }
-            const updateData = {};
-            if (preferredDateTime)
-                updateData.preferredDateTime = preferredDateTime;
-            if (calendlyEventUri)
-                updateData.calendlyEventUri = calendlyEventUri;
-            const booking = await Booking.findByIdAndUpdate(bookingId, updateData, { new: true });
-            if (!booking) {
+            // First, fetch the booking to get the guide name
+            const existingBooking = await Booking.findById(bookingId);
+            if (!existingBooking) {
                 return res.status(404).json({
                     success: false,
                     message: "Booking not found",
                 });
             }
-            console.log("Booking updated:", booking._id, "preferredDateTime:", booking.preferredDateTime);
+            let preferredDateTime = null;
+            preferredDateTime = new Date(calStartTime);
+            const updateData = {};
+            if (preferredDateTime)
+                updateData.preferredDateTime = preferredDateTime;
+            if (calBookingUid)
+                updateData.calBookingUid = calBookingUid;
+            const booking = await Booking.findByIdAndUpdate(bookingId, updateData, { new: true });
+            console.log(`Booking ${booking?._id} updated | preferredDateTime: ${booking?.preferredDateTime} | calBookingUid: ${booking?.calBookingUid}`);
             return res.status(200).json({
                 success: true,
                 message: "Booking slot updated successfully",

@@ -64,19 +64,25 @@ class OrderController {
       // CREATE BOOKING
       // =========================
 
-      const booking = await Booking.create({
+  const bookingData: any = {
         fullName: validatedData.fullName,
         email: validatedData.email,
         phoneNumber: validatedData.phoneNumber,
-        selectedService:
-          validatedData.selectedService,
-        selectedGuide:
-          validatedData.selectedGuide,
-        sessionType:
-          validatedData.sessionType,
-        concernArea:
-          validatedData.concernArea,
-      });
+        selectedService: validatedData.selectedService,
+        selectedGuide: validatedData.selectedGuide,
+        sessionType: validatedData.sessionType,
+      };
+
+      if (validatedData.concernArea?.trim()) {
+        bookingData.concernArea = validatedData.concernArea;
+      }
+
+      if (validatedData.preferredDateTime) {
+        bookingData.preferredDateTime = validatedData.preferredDateTime;
+      }
+
+      const booking = await Booking.create(bookingData);
+
 
       // =========================
       // CREATE RAZORPAY ORDER

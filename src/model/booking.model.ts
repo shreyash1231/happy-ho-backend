@@ -11,7 +11,7 @@ export interface IBooking extends Document {
   sessionType: "Online" | "Offline";
   preferredDateTime?: Date;
   calBookingUid?: string;
-  concernArea: string;
+  concernArea?: string;
 
   createdAt: Date;
   updatedAt: Date;
@@ -63,10 +63,10 @@ const bookingSchema = new Schema<IBooking>(
       required: false,
     },
 
-    concernArea: {
+   concernArea: {
       type: String,
-      required: true,
       trim: true,
+      default: "", // Optional field with default empty string
     },
   },
   {
